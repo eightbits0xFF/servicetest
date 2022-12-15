@@ -15,8 +15,7 @@ public:
     typedef typename service_type::implement impl_t;
 
     explicit  basicWritter(boost::asio::execution_context & context, std::string id):
-        service_{boost::asio::use_
-        service<Services>(context)},
+        service_{boost::asio::use_service<Services>(context)},
         impl{service_.null()}
     {
         service_.create( impl, id );
@@ -57,7 +56,8 @@ public:
         work_thread_{ new boost::thread(
             boost::bind(&boost::asio::io_context::run, &work_io_context_))}
     {
-        
+      
+       
 
     }
 
@@ -91,7 +91,10 @@ public:
     }
 private:
     void write_impl(std::string message) {
+        std::cout << "this thread " << std::this_thread::get_id() << "\n";
         std::cout << "Works " << __LINE__ <<" " << message << "\n";
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+
     }
     boost::asio::io_context work_io_context_;
 
@@ -109,9 +112,10 @@ int main()
     boost::asio::io_context contxt;
     
     writter wr{ contxt, "FIRST" };
+     wr.write_some("What is your name");
+    wr.write_some("My name is pius");
 
-    wr.write_some("What is your name");
 
-    contxt.run();
+  
     
 }
