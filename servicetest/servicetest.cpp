@@ -54,7 +54,7 @@ public:
         work_io_context_(),
         work_{boost::asio::make_work_guard(work_io_context_)},
         work_thread_{ new boost::thread(
-            boost::bind(&boost::asio::io_context::run, &work_io_context_))}
+            boost::bind(&boost::asio::thread_pool::join, &work_io_context_))}
     {
       
        
@@ -96,10 +96,10 @@ private:
         std::this_thread::sleep_for(std::chrono::seconds(5));
 
     }
-    boost::asio::io_context work_io_context_;
+    boost::asio::thread_pool work_io_context_;
 
     boost::asio::executor_work_guard<
-        boost::asio::io_context::executor_type> work_;
+        boost::asio::thread_pool::executor_type> work_;
 
     boost::scoped_ptr<boost::thread> work_thread_;
 
@@ -109,7 +109,7 @@ typedef basicWritter<writter_service> writter;
 
 int main()
 {
-    boost::asio::io_context contxt;
+    boost::asio::thread_pool contxt{5};
     
     writter wr{ contxt, "FIRST" };
      wr.write_some("What is your name");
